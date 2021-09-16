@@ -1,0 +1,147 @@
+{% extends '../base.html' %}
+{% block title %}比赛首页{% endblock %}
+{% block content %}
+    <div class="list-group">
+        <h2 class="text-center">{{ kind_info.kind_name }}</h2><br />
+        <div class="list-group-item">出题机构：<strong style="color: red;font-size: 18px;">{{ kind_info.sponsor_name }}</strong></div>
+        <div class="list-group-item">题目总分：{{ kind_info.total_score }}</div>
+        <div class="list-group-item">题目数量：{{ kind_info.question_num }}</div>
+        <div class="list-group-item">题库大小：{{ bank_info.total_question_num }}道题</div>
+        <div class="list-group-item">开始时间：{{ kind_info.cop_startat }}</div>
+        <div class="list-group-item">结束时间：{{ kind_info.cop_finishat }}</div>
+        <br />
+        <div>
+            <a href="/bs/rank?uid={{ user_info.uid }}&kind_id={{ kind_info.kind_id }}" class="btn btn-success" style="float: right">查看排行榜</a>&nbsp;&nbsp;&nbsp;&nbsp;
+            <a id="startAnswer" href="#" class="btn btn-primary" style="float: left">开始挑战</a>
+            <!--span class="badge" style="float: right;">快来参与吧~</span-->
+        </div>
+    </div>
+    <div id="formModal" class="modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-title">
+                    <h2 class="text-center">请先填写一些答题必要的信息</h2>
+                </div>
+                <div id="frmBody" class="modal-body">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+      $.ajaxSetup({
+          data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
+      });
+      var isShowUserinfo = {{ is_show_userinfo|safe }};
+      var userinfoHasEntered = {{ userinfo_has_enterd|safe }};
+      var fields = {{ userinfo_fields|safe }};
+      var optionFields = {{ option_fields|safe }};
+      var fieldRegexes = {{ field_regexes|safe }};
+      var optionFieldNameList = [];
+      for(var i in optionFields.split('#')){optionFieldNameList[i]=optionFields.split('#')[i].split(':')[0]}
+
+      $('#startAnswer').click(function () {
+          if(isShowUserinfo && !userinfoHasEntered){
+              var strHTML = "<form id=\"formBody\" class=\"form-group\">";
+              for(var i in fields){
+                  if(!checkInList(i, optionFieldNameList)){
+                      strHTML += "<div class=\"form-group\">";
+                      strHTML += "<label for=\"frmId" + i + "\">" + fields[i] + "</label>";
+                      strHTML += "<input id=\"frmId" + i + "\" class=\"form-control\" type=\"text\" placeholder=\"\">";
+                      strHTML += "</div>";
+                  }else if(checkInList(i, optionFieldNameList)){
+                      opl = optionFields.split('#');
+                      for(var j in opl) {
+                          if(opl[j].startsWith(i)) {
+                              strHTML += "<label for=\"frmId" + i + "\">" + fields[i] + "</label>";
+                              strHTML += "<select id=\"frmId" + i + "\" class=\"form-control\">\n";
+                              var t = opl[j].split(':')[1].split(',');
+                              for(var k in t) {
+                                  strHTML += "<option>" + t[k] + "</option>\n";
+                              }
+                              strHTML += "</select>";
+                          }
+                      }
+                  }else{
+                  }
+              }
+
+              strHTML += "<br />";
+              strHTML += "<div class=\"text-right\">\n" +
+                  "<button id=\"frmSubmit\" class=\"btn btn-primary\" type=\"submit\">提交</button>\n" +
+                  "<button id=\"frmCancel\" class=\"btn btn-danger\" data-dismiss=\"modal\">取消</button>\n" +
+                  "</div>";
+              strHTML += "</form>";
+
+              document.getElementById('frmBody').innerHTML = strHTML;
+              $('#formModal').modal('show');
+              $('#frmSubmit').click(function () {
+                  var result = '';
+                  for(var i in fields){
+                      if(!$('#frmId' + i).val().match(getRegex(fieldRegexes, i))) {
+                          $('#frmId' + i).attr('placeholder', getRegexDesc(fieldRegexes, i));
+                          $('#frmId' + i).css('border', '1px solid red');
+                          return false;
+                      }
+                      else {
+                          $('#frmId' + i).css('border', '1px solid #C1FFC1');
+                          result += i + ',' + $('#frmId' + i).val() + '#';
+                      }
+                  }
+                  if(result) {
+                      $.ajax({
+                          url: "/api/entry",
+                          data: {
+                              'kind_id': '{{ kind_info.kind_id|safe }}',
+                              'uid': '{{ user_info.uid|safe }}',
+                              'result': result,
+                          },
+                          type: 'post',
+                          dataType: 'json',
+                          success: function (res) {
+                              if (res.status === 200) {
+                                  window.location.href = '/bs/game?uid=' + res.data.user_info.uid + '&kind_id=' + res.data.kind_info.kind_id;
+                              } else {
+                                  alert('提交失败');
+                              }
+                          }
+                      });
+                      return false;
+                  }
+              })
+          }else
+          {
+              window.location.href = '{% url 'bs:game' %}?uid={{ user_info.uid }}&kind_id={{ kind_info.kind_id }}';
+          }
+      });
+
+    function checkInList(s, l) {
+        for(var i in l){
+            if(s === l[i]){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function getRegex(l, field) {
+        for(var i in l){
+            if(l[i].field_name === field) {
+                return l[i].regex;
+            }
+        }
+    }
+
+    function getRegexDesc(l, field) {
+        for(var i in l){
+            if(l[i].field_name === field) {
+                return l[i].description;
+            }
+        }
+    }
+    </script>
+{% endblock %}

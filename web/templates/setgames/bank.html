@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}我要出题{% endblock %}
+{% block content %}
+    {% if not created %}
+        <div class="span4">
+            <div class="alert alert-success">
+                <strong>简单几步，您就可以拥有自己的题库</strong>
+            </div>
+        </div>
+    <form id="uploadFileForm" method="post" action="/bs/set/bank/upbank" enctype="multipart/form-data">{% csrf_token %}
+    <div id="uploadMainRow" class="row" style="margin-top: 120px;">
+        <div class="col-md-3">
+            <label>① 下载题库</label>
+            <p style="color: gray;margin-top: 5px;"><a id="tDownload" href="/bs/set/bank/tdownload?uid={{ user_info.uid }}" class="btn btn-success btn-sm">下载</a>我们的简易模板，按照模板中的要求修改题库。</p>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="bankName">② 题库名称</label>
+                <input id="bankName" name="bank_name" type="text" class="form-control" placeholder="请输入题库名称" />
+            </div>
+        </div>
+        <div class="col-md-3">
+            <label for="choicedValue">③ 题库类型</label>
+            <div class="dropdown">
+                <input type="text" readonly id="choicedValue" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown" name="bank_type" value="选择一个题库类型" />
+                <div class="dropdown-menu">
+                    {% for t in bank_types %}
+                        <div class="btn btn-default form-control" onclick="choiceBankType(this)">{{ t.name }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="row" style="margin-left:-1px;">
+                <label for="uploadFile">④ 上传文件</label>
+                <input class="form-control" name="template" type="file" style="text-align: inherit" id="uploadFile">
+            </div>
+        </div>
+        <input type="hidden" name="uid" value="{{ user_info.uid }}" />
+    </div>
+    <div class="row" style="margin-top:35px;">
+        <input type="submit" id="startUpload" class="btn btn-danger" style="float: right" value="开始录制">
+    </div>
+    </form>
+    <script src="../../static/js/csrf.js"></script>
+    <script type="text/javascript">
+        var choicedBankType;
+        var responseTypes = {{ bank_types|safe }};
+        var choiceBankType = function (t) {
+            var cbt = $(t).html();
+            for(var i in responseTypes){
+                if(responseTypes[i].name === cbt){
+                    choicedBankType = responseTypes[i].id;
+                    break;
+                }
+            }
+            $('#choicedValue').val(cbt);
+        }
+
+    </script>
+    {% else %}
+    <div class="span4">
+            <div class="alert alert-success">
+                <strong>创建成功!</strong><br />
+                <p>本次创建{{ created.choice_num }}道选择题和{{ created.fillinblank_num }}道填空题</p><br />
+                <a href="/bs/set{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}"><strong>点我</strong></a>继续创建
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

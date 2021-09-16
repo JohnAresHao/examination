@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}排行榜{% endblock %}
+{% block content %}
+    <h2>排行榜</h2><br />
+    <a class="btn btn-primary" href="/index{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">回首页</a>
+    <a class="btn btn-primary" href="/bs{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}&kind_id={{ kind_info.kind_id }}" style="margin-left: 20px;">去答题</a>
+    <ul id="myRank" style="float: right"></ul>
+    <table style="margin-top: 15px;" class="table table-hover">
+        <tr>
+            <th>排名</th>
+            <th>昵称</th>
+            <th>得分</th>
+            <th>用时</th>
+        </tr>
+        {% for r in rank %}
+        <tr>
+            <td>{% if r.rank %}<b style="color:red">{{ r.rank }}</b>{% else %}暂无{% endif %}</td>
+            <td>{% if r.nickname %}{{ r.nickname }}{% else %}暂无{% endif %}</td>
+            <td>{% if r.score %}{{ r.score }}{% else %}0{% endif %}</td>
+            <td>{% if r.time %}{{ r.time }}{% else %}暂无{% endif %}s</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '/api/myrank',
+                data: {
+                    uid: '{{ request.session.uid|safe }}',
+                    kind_id: '{{ kind_info.kind_id|safe }}'
+                },
+                dataType: 'json',
+                type: 'get',
+                success: function (res) {
+                    if(res.status === 200) {
+                        var strHTML = '';
+                        if(res.data.rank) {
+                            strHTML += "<li><b>我的排名: 第 <p style=\"color: red;display:inline\">" + res.data.rank + "</p> 名</b></li>";
+                            strHTML += "<li><b>我的用时: <p style=\"color: red\;display:inline\">" + res.data.time / 1000 + "</p>秒</b></li>";
+                        }
+                        else{
+                            strHTML += "<li><b>我的排名: 暂无</b></li>";
+                            strHTML += "<li><b>我的用时: 暂无</b></li>";
+                        }
+                        $('#myRank').html(strHTML);
+                    }
+                }
+            })
+        })
+    </script>
+{% endblock %}

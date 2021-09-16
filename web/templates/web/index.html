@@ -1,0 +1,263 @@
+{% extends '../base.html' %}
+{% block title %}比赛首页{% endblock %}
+{% block content %}
+    <div class="row">
+      <div class="col-md-2">
+          <ul id="categoryList" class="nav nav-pills nav-stacked">
+              <li id="hot" class="btn btn-primary">热度最高</li>
+              <li id="tech" class="btn btn-default">技术类</li>
+              <li id="edu" class="btn btn-default">教育类</li>
+              <li id="culture" class="btn btn-default">文化类</li>
+              <li id="sport" class="btn btn-default">体育类</li>
+              <li id="general" class="btn btn-default">常识类</li>
+              <li id="interview" class="btn btn-default">面试题</li>
+          </ul>
+      </div>
+      <div class="col-md-10">
+      {% if msg %}
+      <div class="container">
+          <div class="row">
+              <div class="span">
+                  <div class="alert alert-success">
+                      <strong>{{ msg }}</strong>
+                  </div>
+              </div>
+          </div>
+      </div>
+      {% endif %}
+        <div class="list-group">
+            <div id="kindList">
+            {% if kinds %}
+            {% for i in kinds %}
+                <div id="gameList" title="举办机构: {% if i.sponsor_name %} {{ i.sponsor_name }} {% else %}暂无{% endif %}" data-toggle="tooltip" data-placement="left">
+                    <a href="{% url 'bs:index' %}?uid={{ user_info.uid }}&kind_id={{ i.kind_id }}" class="list-group-item"><strong>{{ i.kind_name }}</strong><span class="badge"><small style="color:yellow">热度:</small>&nbsp; {% if i.total_partin_num %}{{ i.total_partin_num }}{% else %}0{% endif %}</span></a>
+                </div>
+            {% endfor %}
+            {% else %}
+                <div class="alert alert-danger">
+                    <strong>暂无热门比赛</strong>
+                </div>
+            {% endif %}
+            </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#hot').addClass('btn btn-primary');
+            loadHot();
+        });
+        $('#hot').click(function () {
+            removeClass();
+            $(this).addClass('btn btn-primary');
+            loadHot();
+        });
+
+        $('#tech').click(function () {
+            removeClass();
+            $(this).addClass('btn btn-primary');
+            $.ajax({
+                url: '/api/games/s/tech',
+                data: {
+                    
+                },
+                type: 'get',
+                dataType: 'json',
+                success: function (res) {
+                    kinds = res.data.kinds;
+                    var strHTML = '';
+                    if(!kinds.length){
+                        $('#kindList').html("<div class=\"alert alert-danger\"><strong>暂无技术类比赛</strong></div>")
+                    }else{
+                        for(var i in kinds){
+                            strHTML += "<div id=\"gameList\" title=\"举办机构:";
+                            strHTML += kinds[i].sponsor_name ? kinds[i].sponsor_name : "暂无";
+                            strHTML += "\" data-toggle=\"tooltip\" data-placement=\"left\">";
+                            strHTML += "<a href=\"{% url 'bs:index' %}?uid={{ user_info.uid }}&kind_id=" + kinds[i].kind_id + "\" class=\"list-group-item\"><strong>" + kinds[i].kind_name + "</strong><span class=\"badge\"><small style=\"color:yellow\">热度:</small>&nbsp;" + kinds[i].total_partin_num + "</span></a>\n";
+                            strHTML += "</div>";
+                        }
+                        $('#kindList').html(strHTML);
+                    }
+                }
+            })
+        });
+        $('#culture').click(function () {
+            removeClass();
+            $(this).addClass('btn btn-primary');
+            $.ajax({
+                url: '/api/games/s/culture',
+                data: {
+
+                },
+                type: 'get',
+                dataType: 'json',
+                success: function (res) {
+                    kinds = res.data.kinds;
+                    var strHTML = '';
+                    if(!kinds.length){
+                        $('#kindList').html("<div class=\"alert alert-danger\"><strong>暂无文化类比赛</strong></div>")
+                    }else{
+                        for(var i in kinds){
+                            strHTML += "<div id=\"gameList\" title=\"举办机构:";
+                            strHTML += kinds[i].sponsor_name ? kinds[i].sponsor_name : "暂无";
+                            strHTML += "\" data-toggle=\"tooltip\" data-placement=\"left\">";
+                            strHTML += "<a href=\"{% url 'bs:index' %}?uid={{ user_info.uid }}&kind_id=" + kinds[i].kind_id + "\" class=\"list-group-item\"><strong>" + kinds[i].kind_name + "</strong><span class=\"badge\"><small style=\"color:yellow\">热度:</small>&nbsp;" + kinds[i].total_partin_num + "</span></a>\n";
+                            strHTML += "</div>";
+                        }
+                        $('#kindList').html(strHTML);
+                    }
+                }
+            })
+        });
+        $('#edu').click(function () {
+            removeClass();
+            $(this).addClass('btn btn-primary');
+            $.ajax({
+                url: '/api/games/s/edu',
+                data: {
+
+                },
+                type: 'get',
+                dataType: 'json',
+                success: function (res) {
+                    kinds = res.data.kinds;
+                    var strHTML = '';
+                    if(!kinds.length){
+                        $('#kindList').html("<div class=\"alert alert-danger\"><strong>暂无教育类比赛</strong></div>")
+                    }else{
+                        for(var i in kinds){
+                            strHTML += "<div id=\"gameList\" title=\"举办机构:";
+                            strHTML += kinds[i].sponsor_name ? kinds[i].sponsor_name : "暂无";
+                            strHTML += "\" data-toggle=\"tooltip\" data-placement=\"left\">";
+                            strHTML += "<a href=\"{% url 'bs:index' %}?uid={{ user_info.uid }}&kind_id=" + kinds[i].kind_id + "\" class=\"list-group-item\"><strong>" + kinds[i].kind_name + "</strong><span class=\"badge\"><small style=\"color:yellow\">热度:</small>&nbsp;" + kinds[i].total_partin_num + "</span></a>\n";
+                            strHTML += "</div>";
+                        }
+                        $('#kindList').html(strHTML);
+                    }
+                }
+            })
+        });
+        $('#sport').click(function () {
+            removeClass();
+            $(this).addClass('btn btn-primary');
+            $.ajax({
+                url: '/api/games/s/sport',
+                data: {
+
+                },
+                type: 'get',
+                dataType: 'json',
+                success: function (res) {
+                    kinds = res.data.kinds;
+                    var strHTML = '';
+                    if(!kinds.length){
+                        $('#kindList').html("<div class=\"alert alert-danger\"><strong>暂无体育类比赛</strong></div>")
+                    }else{
+                        for(var i in kinds){
+                            strHTML += "<div id=\"gameList\" title=\"举办机构:";
+                            strHTML += kinds[i].sponsor_name ? kinds[i].sponsor_name : "暂无";
+                            strHTML += "\" data-toggle=\"tooltip\" data-placement=\"left\">";
+                            strHTML += "<a href=\"{% url 'bs:index' %}?uid={{ user_info.uid }}&kind_id=" + kinds[i].kind_id + "\" class=\"list-group-item\"><strong>" + kinds[i].kind_name + "</strong><span class=\"badge\"><small style=\"color:yellow\">热度:</small>&nbsp;" + kinds[i].total_partin_num + "</span></a>\n";
+                            strHTML += "</div>";
+                        }
+                        $('#kindList').html(strHTML);
+                    }
+                }
+            })
+        });
+        $('#general').click(function () {
+            removeClass();
+            $(this).addClass('btn btn-primary');
+            $.ajax({
+                url: '/api/games/s/general',
+                data: {
+
+                },
+                type: 'get',
+                dataType: 'json',
+                success: function (res) {
+                    kinds = res.data.kinds;
+                    var strHTML = '';
+                    if(!kinds.length){
+                        $('#kindList').html("<div class=\"alert alert-danger\"><strong>暂无常识类比赛</strong></div>")
+                    }else{
+                        for(var i in kinds){
+                            strHTML += "<div id=\"gameList\" title=\"举办机构:";
+                            strHTML += kinds[i].sponsor_name ? kinds[i].sponsor_name : "暂无";
+                            strHTML += "\" data-toggle=\"tooltip\" data-placement=\"left\">";
+                            strHTML += "<a href=\"{% url 'bs:index' %}?uid={{ user_info.uid }}&kind_id=" + kinds[i].kind_id + "\" class=\"list-group-item\"><strong>" + kinds[i].kind_name + "</strong><span class=\"badge\"><small style=\"color:yellow\">热度:</small>&nbsp;" + kinds[i].total_partin_num + "</span></a>\n";
+                            strHTML += "</div>";
+                        }
+                        $('#kindList').html(strHTML);
+                    }
+                }
+            })
+        });
+        $('#interview').click(function () {
+            removeClass();
+            $(this).addClass('btn btn-primary');
+            $.ajax({
+                url: '/api/games/s/interview',
+                data: {
+
+                },
+                type: 'get',
+                dataType: 'json',
+                success: function (res) {
+                    kinds = res.data.kinds;
+                    var strHTML = '';
+                    if(!kinds.length){
+                        $('#kindList').html("<div class=\"alert alert-danger\"><strong>暂无面试可以参加</strong></div>")
+                    }else{
+                        for(var i in kinds){
+                            strHTML += "<div id=\"gameList\" title=\"举办机构:";
+                            strHTML += kinds[i].sponsor_name ? kinds[i].sponsor_name : "暂无";
+                            strHTML += "\" data-toggle=\"tooltip\" data-placement=\"left\">";
+                            strHTML += "<a href=\"{% url 'bs:index' %}?uid={{ user_info.uid }}&kind_id=" + kinds[i].kind_id + "\" class=\"list-group-item\"><strong>" + kinds[i].kind_name + "</strong><span class=\"badge\"><small style=\"color:yellow\">热度:</small>&nbsp;" + kinds[i].total_partin_num + "</span></a>\n";
+                            strHTML += "</div>";
+                        }
+                        $('#kindList').html(strHTML);
+                    }
+                }
+            })
+        });
+        $(function () {
+            $("[data-toggle='tooltip']").tooltip();
+        });
+
+        var removeClass = function () {
+            var ids = ['hot', 'edu', 'culture', 'sport', 'tech', 'interview', 'general'];
+            for(var i in ids){
+                $('#' + ids[i]).removeClass('btn btn-primary');
+                $('#' + ids[i]).addClass('btn btn-default');
+            }
+        };
+
+        function loadHot() {
+            $.ajax({
+                url: '/api/games/s/hot',
+                data: {
+
+                },
+                type: 'get',
+                dataType: 'json',
+                success: function (res) {
+                    kinds = res.data.kinds;
+                    var strHTML = '';
+                    if(!kinds.length){
+                        $('#kindList').html("<div class=\"alert alert-danger\"><strong>暂无热门比赛</strong></div>")
+                    }else{
+                        for(var i in kinds){
+                            strHTML += "<div id=\"gameList\" title=\"举办机构:";
+                            strHTML += kinds[i].sponsor_name ? kinds[i].sponsor_name : "暂无";
+                            strHTML += "\" data-toggle=\"tooltip\" data-placement=\"left\">";
+                            strHTML += "<a href=\"{% url 'bs:index' %}?uid={{ user_info.uid }}&kind_id=" + kinds[i].kind_id + "\" class=\"list-group-item\"><strong>" + kinds[i].kind_name + "</strong><span class=\"badge\"><small style=\"color:yellow\">热度:</small>&nbsp;" + kinds[i].total_partin_num + "</span></a>\n";
+                            strHTML += "</div>";
+                        }
+                        $('#kindList').html(strHTML);
+                    }
+                }
+            })
+        }
+    </script>
+{% endblock %}
