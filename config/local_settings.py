@@ -30,7 +30,7 @@ EMAIL_USE_SSL = False
 EMAIL_HOST = 'smtp.163.com'
 EMAIL_PORT = 25
 EMAIL_HOST_USER = 'triumphares@163.com'
-EMAIL_HOST_PASSWORD = 'bxbd6698'
+EMAIL_HOST_PASSWORD = 'somewords'
 # Email address that error messages come from.
 # Default email address to use for various automated correspondence from
 # the site managers.
